@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 
 public abstract class ConnectionAbstractDAO {
-		private final String url = "jdbc:oracle:thin:@cometdb.cbbqesq1alra.us-east-2.rds.amazonaws.com:1521:cometdb"; // enter your own credentials
+		private final String url = ""; // enter your own credentials
 		private final String username = "PlasmaSnake"; 
 		private final String password = "P4ssw0rd";
 		private final Driver driver = new oracle.jdbc.driver.OracleDriver(); // ensure you have odjbc6 or similar as a referenced lib
