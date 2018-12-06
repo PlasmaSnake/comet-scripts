@@ -1,4 +1,4 @@
-package com.script;
+package com.CometDatabaseHandler;
 
 import java.io.File;
 import java.io.FileReader;
@@ -8,23 +8,28 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Iterator;
 
-import com.scriptDAO.ConnectionAbstractDAO;
-import com.scriptDAO.SQLDataInsertDAOI;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.CometDatabaseHandlerDAO.ConnectionAbstractDAO;
+import com.CometDatabaseHandlerDAO.SQLDataInsertDAOI;
+
+/**
+ * @author Students
+ * This class inserts data from a .json response into the comet AWS Oracle SQL database
+ */
 @SuppressWarnings("unused")
-public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInsertDAOI{
+public class SQLDataInsertDAO extends ConnectionAbstractDAO implements SQLDataInsertDAOI{
 
 	public static void main(String[] args) throws Exception {
-		SQLDataInsert sqlDataInsert = new SQLDataInsert();
+		SQLDataInsertDAO sqlDataInsert = new SQLDataInsertDAO();
 		// USE TO INSERT BASIC COIN INFORMATION
-//		sqlDataInsert.parseBasicCoinData("42");
-		// right now i am trying to insert basicdata
-		sqlDataInsert.parseHistCoinData("BTC");
+//		sqlDataInsertDAO.parseBasicCoinData("42");
+		// USE TO INSERT HISTORICAL COIN INFORMATION - WILL TAKE A WHILE
+//		sqlDataInsertDAO.parseHistCoinData("BTC");
 	}
+
 
 	@Override
 	public JSONObject connectToHistoricalFile(int fileNumber, String coin) throws Exception{
@@ -44,8 +49,6 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 		
 		return jsonObject;
 	}
-	
-	// TODO test
 		@Override
 	public boolean parseHistCoinData(String coin) throws Exception {
 		// check for amount of files in folder, from 0 to max-1 (not including basic info file)
@@ -65,6 +68,7 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 					// coin is not found in database
 					if (coinID < 0) return false;
 					
+					@SuppressWarnings("unchecked")
 					Iterator<JSONObject> iterator = coinData.iterator();
 					while (iterator.hasNext()) {
 						// iterates through entire array and inserts into historical table
@@ -98,9 +102,7 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 				
 				String symbol = (String) coinData.get("Symbol");
 				String coinName = (String) coinData.get("CoinName");
-				double maxSupply = Double.valueOf((String)coinData.get("TotalCoinSupply"));
-//				BigDecimal bDecimal = new BigDecimal(maxSupply);
-				
+				double maxSupply = Double.valueOf((String)coinData.get("TotalCoinSupply"));			
 				insertCoinBasicData(symbol, coinName, maxSupply);
 				return true;
 			} catch (NullPointerException e) { System.out.println("ERR: Coin not found");
@@ -124,8 +126,7 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 		}
 		return false;
 	}
-
-	// TODO implement
+	
 	@Override
 	public boolean insertCoinBasicData(String symbol, String coinName, double maxSupply) throws SQLException {
 		try {
@@ -142,14 +143,13 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 		}
 		return false;
 	}
-	// TODO test - need to 
+	// TODO test - need to refactor - preparing statements.
 	@Override
 	public boolean insertCoinHistoricalData(int coinID, long timestamp, double open, double close, double high, double low,
 			double volumeTo, double volumeFrom) throws SQLException {
 		try {
 			this.connect();
 			ps = conn.prepareStatement(SQL.INSERT_COIN_HISTORICAL_DATA.getQuery());
-			// TODO insert coin_id which refers to a coin in basic info
 			ps.setInt(1, coinID);
 			ps.setLong(2, timestamp);
 			ps.setDouble(3, open);
@@ -169,9 +169,13 @@ public class SQLDataInsert extends ConnectionAbstractDAO implements SQLDataInser
 
 	// TODO implement
 	@Override
-	public boolean assignUserCoin() throws SQLException {
+	public boolean assignUserCoin(String symbol) throws SQLException {
 		try {
 			this.connect();
+			if(getCoinID(symbol) == -1) return false;
+			else {
+				
+			}
 			ps = conn.prepareStatement(SQL.INSERT_COIN_BASIC_DATA.getQuery());
 		} catch (SQLException e) {e.printStackTrace();} 
 		finally {

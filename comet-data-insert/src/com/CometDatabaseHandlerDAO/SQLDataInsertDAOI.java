@@ -1,4 +1,4 @@
-package com.scriptDAO;
+package com.CometDatabaseHandlerDAO;
 
 import java.sql.SQLException;
 
@@ -86,7 +86,7 @@ public interface SQLDataInsertDAOI {
 	/** Links a user to a coin by inserting a values into UserCoins
 	 * @return false if unable to insert data, true if data is inserted.
 	 */
-	boolean assignUserCoin() throws SQLException;
+	boolean assignUserCoin(String symbol) throws SQLException;
 	
 	
 	/** Queries the database for the coin id. Returns -1 if not found.

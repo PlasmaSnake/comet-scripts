@@ -1,1 +1,2 @@
-/comet-data-insert/bin/com/scriptDAO/ConnectionAbstractDAO.class
+#ignore credentials
+/comet-data-insert/*/scriptDAO/ConnectionAbstractDAO.class
